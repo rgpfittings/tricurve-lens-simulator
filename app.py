@@ -349,9 +349,17 @@ def plot_tangential_map(topo: TopographyInputs, settings: AppSettings):
     rho = np.hypot(xq, yq)
     outside = rho > settings.map_diameter_mm / 2
 
-    zx, zy = np.gradient(z, dx, dx)
-    zxx, zxy1 = np.gradient(zx, dx, dx)
-    zxy2, zyy = np.gradient(zy, dx, dx)
+    # IMPORTANT:
+    # np.gradient returns derivatives in array-axis order: row/y first, column/x second.
+    # MATLAB's gradient output order differs, so using zx, zy = np.gradient(...)
+    # swaps the x/y derivatives and rotates the topography colour pattern by 90 degrees.
+    zy, zx = np.gradient(z, dx, dx)
+
+    # Second derivatives:
+    # gradient(zx) -> [dZx/dy, dZx/dx] = [Zxy, Zxx]
+    # gradient(zy) -> [dZy/dy, dZy/dx] = [Zyy, Zxy]
+    zxy1, zxx = np.gradient(zx, dx, dx)
+    zyy, zxy2 = np.gradient(zy, dx, dx)
     zxy = 0.5 * (zxy1 + zxy2)
 
     denom_n = np.sqrt(1 + zx**2 + zy**2)
