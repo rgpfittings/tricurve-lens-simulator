@@ -762,7 +762,7 @@ def build_order_lines(topo, lens, settings, has_orx=False, orx_sphere_d=0.0, orx
             spec_line,
             tear_line,
             f"Current on-eye system: {format_rx_string(current_s, current_c, current_a)}",
-            f"Compensated front toric order: {format_rx_string(lens_air_s, lens_air_c, O['lens_air_order_axis'])}",
+            f"CPE BVP: {format_rx_string(lens_air_s, lens_air_c, O['lens_air_order_axis'])}",
             f"Predicted final on-eye system: {format_rx_string(target_s, target_c, target_a)}",
             f"Predicted residual: {format_rx_string(res_s, res_c, res_a)}",
         ]
