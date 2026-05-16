@@ -583,9 +583,21 @@ def compute_order_summary(
 
     # Current trial lens air powers
     if lens.is_toric:
-        # SPE bitoric assumption when no ORx is used
-        lens_air_flat_trial = topo.lens_bvp_d - tear_flat
-        lens_air_steep_trial = topo.lens_bvp_d - tear_steep
+        # SPE bitoric assumption:
+        #   Dioptric difference between base curves ~= dioptric difference
+        #   between the meridional lens BVPs.
+        #
+        # The entered Lens BVP is treated as the flat-meridian/labelled SPE power.
+        # The steeper base-curve meridian is assigned extra minus power equal to
+        # the base-curve dioptric difference, using the tear/air keratometric index.
+        #
+        # Example: 8.00 / 7.50 mm gives
+        #   delta_bc_d = 1000*(1.3375 - 1)*(1/7.50 - 1/8.00) ~= +2.81 D
+        #   lens_air_flat_trial  = entered BVP
+        #   lens_air_steep_trial = entered BVP - 2.81 D
+        delta_bc_d = FBCsteep - FBCflat
+        lens_air_flat_trial = topo.lens_bvp_d
+        lens_air_steep_trial = topo.lens_bvp_d - delta_bc_d
     else:
         lens_air_flat_trial = topo.lens_bvp_d
         lens_air_steep_trial = topo.lens_bvp_d
@@ -762,7 +774,7 @@ def build_order_lines(topo, lens, settings, has_orx=False, orx_sphere_d=0.0, orx
         steep_line,
         tor_line,
         f"Lens BVP in air: flat {O['lens_air_flat']:+.2f} D, steep {O['lens_air_steep']:+.2f} D",
-        f"Nominal power effect: {topo.lens_bvp_d:+.2f} DS",
+        f"Nominal labelled SPE power: {topo.lens_bvp_d:+.2f} DS",
         spec_line,
         tear_line,
         f"Estimated on-eye system: {format_rx_string(target_s, target_c, target_a)}",
